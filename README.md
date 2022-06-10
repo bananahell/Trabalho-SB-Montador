@@ -11,10 +11,10 @@ Esse trabalho consiste em colocar em prática esses conceitos implementando uma 
 
 ## Estrutura do projeto
 
-### /code
+### ./code
 
 A pasta code tem os códigos, o executável (.exe), e os códigos de entrada e saída assembly.  
 
-### /code/src | /code/include
+### ./code/src | ./code/include
 
 As pastas src e include possuem os códigos em C++ (src) e os .h (include).  
