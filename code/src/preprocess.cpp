@@ -2,74 +2,96 @@
 
 #include <cstdio>
 #include <cstring>
+#include <map>
 
 #include "globalOps.h"
 
-bool preProcessCode(char* fileName) {
+using namespace std;
+
+void preProcessCode(char* fileNameIn, char* fileNameOut) {
   FILE* inputFile;
   FILE* outputFile;
   int lineCount = 0;
+  map<char*, int> equTable;
+  bool skipNextLine = false;
 
   // Abre o arquivo a ser lido
-  inputFile = fopen(fileName, "r");
+  inputFile = fopen(fileNameIn, "r");
   if (inputFile == NULL) {
-    printf("Input file %s could not be read.\n", fileName);
-    return false;
+    printf("Arquivo de entrada %s nao pode ser lido!\n", fileNameIn);
+    return;
   }
 
   // Cria o arquivo onde vai ser escrito o pre-processado
-  outputFile = fopen(fileName, "w");
+  outputFile = fopen(fileNameOut, "w");
   if (outputFile == NULL) {
-    printf("Output file could not be created.\n");
+    printf("Arquivo de saida %s nao pode ser criado!\n", fileNameOut);
     fclose(inputFile);
-    return false;
+    return;
   }
 
+  // Loop principal, que le de linha em linha
   while (!feof(inputFile)) {
     char line[MAX_LINE_SIZE];
-    char* lineTokens;
+    char* lineToken;
     char token1[MAX_TOKEN_SIZE];
     char token2[MAX_TOKEN_SIZE];
     char token3[MAX_TOKEN_SIZE];
     char token4[MAX_TOKEN_SIZE];
     int lineTokensAmount = 0;
-    char tokenLastChar;
+    bool skipLineBecauseComment = false;
+
+    // Usado quando teve if falso na linha passada
+    if (skipNextLine == true) {
+      skipNextLine = false;
+      continue;
+    }
 
     // Le a linha e pega no maximo 4 tokens
     fgets(line, MAX_LINE_SIZE, inputFile);
-    lineTokens = strtok(line, WHITESPACE);
-    while (lineTokens != NULL) {
+    lineToken = strtok(line, WHITESPACE);
+    while (lineToken != NULL) {
+      // Ja mata qualquer token que comeca com comentario
+      if (lineToken[0] == ';') {
+        break;
+      }
+      // Aqui mata token que tem comentario no meio, tipo to;ken
+      char* commentChar = strchr(lineToken, ';');
+      if (commentChar != NULL) {
+        lineToken[commentChar - lineToken] = '\0';
+        skipLineBecauseComment = true;
+      }
+
+      // Pega sempre no maximo 4 tokens para trabalhar neles
       switch (lineTokensAmount) {
         case 0:
-          strcpy(token1, lineTokens);
+          strcpy(token1, lineToken);
           break;
         case 1:
-          strcpy(token2, lineTokens);
+          strcpy(token2, lineToken);
           break;
         case 2:
-          strcpy(token3, lineTokens);
+          strcpy(token3, lineToken);
           break;
         case 3:
-          strcpy(token4, lineTokens);
+          strcpy(token4, lineToken);
           break;
         default:
           break;
       }
-      lineTokens = strtok(NULL, WHITESPACE);
+
+      // Achou token com comentario no meio, tipo to;ken
+      if (skipLineBecauseComment == true) {
+        break;
+      }
+
+      // Pega o proximo token
+      lineToken = strtok(NULL, WHITESPACE);
       lineTokensAmount++;
     }
 
     // Guardo a quantidade de linhas lidas ate agora
     lineCount++;
-
-    // Ja mata aqui linhas que sao so comentario
-    if (token1 != NULL && token1[0] == ';') {
-      continue;
-    }
-
-    if (lineTokensAmount > 0) {
-      tokenLastChar = token1[(sizeof(token1) / sizeof(token1[0])) - 1];
-    }
 
     // Aqui eu checo quantos tokens apareceram na linha e mexo neles conforme, o
     // que eh um saco, mas se tem mais ou menos tokens em uma linha, pode ser
@@ -79,91 +101,103 @@ bool preProcessCode(char* fileName) {
       case 0:
         continue;
 
-      // Aqui tem 1 token, entao eh label, stop, ou endmacro
+      // Aqui so mexo se tiver label
       case 1:
-        if (tokenLastChar == ':') {
-          // TODO achei label!
-        } else if (strcmp(token1, STOP_STR) == 0 ||
-                   strcmp(token1, STOP_STR_LOW) == 0) {
-          // TODO achei stop!
-        } else if (strcmp(token1, ENDMACRO_STR) == 0 ||
-                   strcmp(token1, ENDMACRO_STR_LOW) == 0) {
-          // TODO achei endmacro!
+        char token1LastChar;
+        token1LastChar = token1[(sizeof(token1) / sizeof(token1[0])) - 1];
+
+        if (token1LastChar == ':') {
+          // Label sozinha agora vai ser alinhada
+          fprintf(outputFile, toupperString(token1));
+          fprintf(outputFile, " ");
+
         } else {
-          // TODO aqui nao era pra chegar, filhao... instrucao errada ou if.....
+          // So imprime a linha mesmo
+          fprintf(outputFile, toupperString(token1));
+          fprintf(outputFile, "\n");
         }
+
         break;
 
-      // Aqui tem 2 tokens, entao eh label com stop, instrucao tamanho 2, if, ou
-      // label com macro
+      // Aqui so mexo se tiver if ou label
       case 2:
-        if (tokenLastChar == ':') {
-          if (strcmp(token2, MACRO_STR) == 0 ||
-              strcmp(token2, MACRO_STR_LOW) == 0) {
-            // TODO achei macro!
-          } else if (strcmp(token2, STOP_STR) == 0 ||
-                     strcmp(token2, STOP_STR_LOW) == 0) {
-            // TODO achei stop!
-          } else {
-            // TODO nao eh macro, nem stop.... eh erro
+        if (strcmp(IF_STR, toupperString(token1)) == 0) {
+          // Achei um if!
+          map<char*, int>::iterator equFound;
+          equFound = equTable.find(token2);
+
+          if (equFound != equTable.end()) {
+            if (equFound->second != 0) {
+              skipNextLine = true;
+            }
           }
-        } else if (strcmp(token1, IF_STR) == 0 ||
-                   strcmp(token1, IF_STR_LOW) == 0) {
-          // TODO achei if!
-        } else if (checkIfInstructionOf2Ops(token1) == true) {
-          // TODO achou uma instrucao de dois operandos!
+
         } else {
-          // TODO aqui nao era pra chegar, filhao... erro
+          // So imprime a linha mesmo
+          fprintf(outputFile, toupperString(token1));
+          fprintf(outputFile, " ");
+          fprintf(outputFile, toupperString(token2));
+          fprintf(outputFile, "\n");
         }
+
         break;
 
-      // Aqui tem 3 tokens, entao eh label com instrucao tamanho 2, const,
-      // space, ou copy
+      // Aqui so mexo se tiver equ ou label
       case 3:
-        if (tokenLastChar == ':') {
-          if (checkIfInstructionOf2Ops(token2) == true) {
-            // TODO achei label com instrucao de 2!
+        if (strcmp(EQU_STR, toupperString(token2)) == 0) {
+          // Achei um equ!
+          char* equName;
+          map<char*, int>::iterator equFound;
+          strcpy(equName, token1);
+          equName[strlen(equName) - 1] = '\0';
+
+          equFound = equTable.find(equName);
+          if (equFound == equTable.end()) {
+            equTable.insert(pair<char*, int>(equName, atoi(token3)));
           } else {
-            // TODO que instrucao eh essa, mane?
+            printf("Dois EQUs com o mesmo nome encontrados!\n");
+            printf("Retornando com erro!\n");
+            // TODO tipo de erro? Professor falou que nao tinha......
+            fclose(outputFile);
+            fclose(inputFile);
+            return;
           }
-        } else if (strcmp(token1, CONST_STR) == 0 ||
-                   strcmp(token1, CONST_STR_LOW) == 0) {
-          // TODO achei const!
-        } else if (strcmp(token1, SPACE_STR) == 0 ||
-                   strcmp(token1, SPACE_STR_LOW) == 0) {
-          // TODO achei space!
-        } else if (strcmp(token1, COPY_STR) == 0 ||
-                   strcmp(token1, COPY_STR_LOW) == 0) {
-          // TODO achei copy!
+
         } else {
-          // TODO achou o que ai, filhao? erro eh o que tu achou
+          // So imprime a linha mesmo
+          fprintf(outputFile, toupperString(token1));
+          fprintf(outputFile, " ");
+          fprintf(outputFile, toupperString(token2));
+          fprintf(outputFile, " ");
+          fprintf(outputFile, toupperString(token3));
+          fprintf(outputFile, "\n");
         }
+
         break;
 
-      // Aqui tem 4 tokens, entao eh label com copy, const, ou space
+      // Aqui so mexo se tiver label
       case 4:
-        if (tokenLastChar == ':') {
-          if (strcmp(token1, CONST_STR) == 0 ||
-              strcmp(token1, CONST_STR_LOW) == 0) {
-            // TODO achei const!
-          } else if (strcmp(token1, SPACE_STR) == 0 ||
-                     strcmp(token1, SPACE_STR_LOW) == 0) {
-            // TODO achei space!
-          } else if (strcmp(token1, COPY_STR) == 0 ||
-                     strcmp(token1, COPY_STR_LOW) == 0) {
-            // TODO achei copy!
-          }
-        } else {
-          // TODO achou o que ai, filhao? erro eh o que tu achou
-        }
+        // So imprime a linha mesmo
+        fprintf(outputFile, toupperString(token1));
+        fprintf(outputFile, " ");
+        fprintf(outputFile, toupperString(token2));
+        fprintf(outputFile, " ");
+        fprintf(outputFile, toupperString(token3));
+        fprintf(outputFile, " ");
+        fprintf(outputFile, toupperString(token4));
+        fprintf(outputFile, "\n");
+
         break;
 
       default:
-        break;
+        printf("Nunca era nem para entrar aqui......... huh?\n");
+        return;
     }
   }
 
   fclose(outputFile);
   fclose(inputFile);
-  return true;
+  printf("Sucesso!\n");
+  printf("\n");
+  return;
 }

@@ -2,7 +2,7 @@
 
 #include <cstdio>
 
-bool assembleCode(char* fileName) {
-  printf("File %s in assembleCode\n", fileName);
+bool assembleCode(char* fileNameIn, char* fileNameOut) {
+  printf("File %s and %s in assembleCode\n", fileNameIn, fileNameOut);
   return true;
 }

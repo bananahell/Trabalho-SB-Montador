@@ -1,6 +1,6 @@
 #ifndef PREPROCESS
 #define PREPROCESS
 
-bool preProcessCode(char*);
+void preProcessCode(char*, char*);
 
 #endif  // PREPROCESS
