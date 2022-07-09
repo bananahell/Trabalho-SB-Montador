@@ -10,8 +10,7 @@ int main(int argc, char *argv[]) {
   int fileNameSize;
   bool success = true;
 
-  if (argc != 3 ||
-      (argc > 1 && (strcmp(argv[1], "-p") && strcmp(argv[1], "-o")))) {
+  if (argc > 1 && (strcmp(argv[1], "-p") && strcmp(argv[1], "-o"))) {
     printf("Command to run this program was wrong.\n");
     printf("There must be exactly 3 fields in the command, ");
     printf("one being the command, then the flag, then the file's name.\n");
