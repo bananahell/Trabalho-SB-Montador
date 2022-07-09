@@ -1,41 +1,33 @@
 #include "globalOps.h"
 
+#include <cctype>
+#include <cstdio>
 #include <cstring>
+#include <iostream>
 
-bool checkIfInstruction(char* token) {
-  if (strcmp(token, ADD_STR) == 0 || strcmp(token, ADD_STR_LOW) == 0 ||
-      strcmp(token, SUB_STR) == 0 || strcmp(token, SUB_STR_LOW) == 0 ||
-      strcmp(token, MUL_STR) == 0 || strcmp(token, MUL_STR_LOW) == 0 ||
-      strcmp(token, DIV_STR) == 0 || strcmp(token, DIV_STR_LOW) == 0 ||
-      strcmp(token, JMP_STR) == 0 || strcmp(token, JMP_STR_LOW) == 0 ||
-      strcmp(token, JMPN_STR) == 0 || strcmp(token, JMPN_STR_LOW) == 0 ||
-      strcmp(token, JMPP_STR) == 0 || strcmp(token, JMPP_STR_LOW) == 0 ||
-      strcmp(token, JMPZ_STR) == 0 || strcmp(token, JMPZ_STR_LOW) == 0 ||
-      strcmp(token, COPY_STR) == 0 || strcmp(token, COPY_STR_LOW) == 0 ||
-      strcmp(token, LOAD_STR) == 0 || strcmp(token, LOAD_STR_LOW) == 0 ||
-      strcmp(token, STORE_STR) == 0 || strcmp(token, STORE_STR_LOW) == 0 ||
-      strcmp(token, INPUT_STR) == 0 || strcmp(token, INPUT_STR_LOW) == 0 ||
-      strcmp(token, OUTPUT_STR) == 0 || strcmp(token, OUTPUT_STR_LOW) == 0 ||
-      strcmp(token, STOP_STR) == 0 || strcmp(token, STOP_STR_LOW) == 0) {
-    return true;
-  }
-  return false;
+int checkInstruction(char* token) {
+  std::string Stoken(toupperString(token));
+
+  if (Stoken == ADD_STR || Stoken == JMPP_STR || Stoken == SUB_STR ||
+      Stoken == JMPZ_STR || Stoken == MUL_STR || Stoken == INPUT_STR ||
+      Stoken == DIV_STR || Stoken == LOAD_STR || Stoken == JMP_STR ||
+      Stoken == STORE_STR || Stoken == JMPN_STR || Stoken == OUTPUT_STR) {
+    return 2;
+  } else if (Stoken == COPY_STR) {
+    return 3;
+  } else if (Stoken == STOP_STR) {
+    return 1;
+  } else
+    return -1;
 }
 
-bool checkIfInstructionOf2Ops(char* token) {
-  if (strcmp(token, ADD_STR) == 0 || strcmp(token, ADD_STR_LOW) == 0 ||
-      strcmp(token, SUB_STR) == 0 || strcmp(token, SUB_STR_LOW) == 0 ||
-      strcmp(token, MUL_STR) == 0 || strcmp(token, MUL_STR_LOW) == 0 ||
-      strcmp(token, DIV_STR) == 0 || strcmp(token, DIV_STR_LOW) == 0 ||
-      strcmp(token, JMP_STR) == 0 || strcmp(token, JMP_STR_LOW) == 0 ||
-      strcmp(token, JMPN_STR) == 0 || strcmp(token, JMPN_STR_LOW) == 0 ||
-      strcmp(token, JMPP_STR) == 0 || strcmp(token, JMPP_STR_LOW) == 0 ||
-      strcmp(token, JMPZ_STR) == 0 || strcmp(token, JMPZ_STR_LOW) == 0 ||
-      strcmp(token, LOAD_STR) == 0 || strcmp(token, LOAD_STR_LOW) == 0 ||
-      strcmp(token, STORE_STR) == 0 || strcmp(token, STORE_STR_LOW) == 0 ||
-      strcmp(token, INPUT_STR) == 0 || strcmp(token, INPUT_STR_LOW) == 0 ||
-      strcmp(token, OUTPUT_STR) == 0 || strcmp(token, OUTPUT_STR_LOW) == 0) {
-    return true;
+char* toupperString(char* stringIn) {
+  std::string Stoken(stringIn);
+  for (auto& character : Stoken) {
+    character = toupper(character);
   }
-  return false;
+
+  char* auxString = new char[Stoken.length() + 1];
+  strcpy(auxString, Stoken.c_str());
+  return auxString;
 }

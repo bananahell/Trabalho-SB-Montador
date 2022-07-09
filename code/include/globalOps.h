@@ -51,7 +51,7 @@
 
 #define ADD_OP 1
 #define SUB_OP 2
-#define MUL_OP 3
+#define MULT_OP 3
 #define DIV_OP 4
 #define JMP_OP 5
 #define JMPN_OP 6
@@ -64,7 +64,8 @@
 #define OUTPUT_OP 13
 #define STOP_OP 14
 
-bool checkIfInstruction(char*);
-bool checkIfInstructionOf2Ops(char*);
+int checkInstruction(char*);
+
+char* toupperString(char*);
 
 #endif  // GLOBALVARS
