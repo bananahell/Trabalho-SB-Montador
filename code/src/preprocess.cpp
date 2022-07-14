@@ -39,27 +39,23 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
     char token3[MAX_TOKEN_SIZE];
     char token4[MAX_TOKEN_SIZE];
     int lineTokensAmount = 0;
-    bool skipLineBecauseComment = false;
 
     // Usado quando teve if falso na linha passada
     if (skipNextLine == true) {
       skipNextLine = false;
+      strcpy(line, "");
       continue;
     }
 
     // Le a linha e pega no maximo 4 tokens
     fgets(line, MAX_LINE_SIZE, inputFile);
+    printf("%s ", line);
     lineToken = strtok(line, WHITESPACE);
+
     while (lineToken != NULL) {
       // Ja mata qualquer token que comeca com comentario
       if (lineToken[0] == ';') {
         break;
-      }
-      // Aqui mata token que tem comentario no meio, tipo to;ken
-      char* commentChar = strchr(lineToken, ';');
-      if (commentChar != NULL) {
-        lineToken[commentChar - lineToken] = '\0';
-        skipLineBecauseComment = true;
       }
 
       // Pega sempre no maximo 4 tokens para trabalhar neles
@@ -80,11 +76,6 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
           break;
       }
 
-      // Achou token com comentario no meio, tipo to;ken
-      if (skipLineBecauseComment == true) {
-        break;
-      }
-
       // Pega o proximo token
       lineToken = strtok(NULL, WHITESPACE);
       lineTokensAmount++;
@@ -99,29 +90,34 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
     switch (lineTokensAmount) {
       // Aqui achei linha em branco... xau xau bau bau
       case 0:
+        printf("case 0\n");
+        printf("\n");
         continue;
 
       // Aqui so mexo se tiver label
       case 1:
+        printf("case 1   ");
         char token1LastChar;
-        token1LastChar = token1[(sizeof(token1) / sizeof(token1[0])) - 1];
+        token1LastChar = token1[strlen(token1) - 1];
 
         if (token1LastChar == ':') {
+          printf("if :   ");
           // Label sozinha agora vai ser alinhada
-          fprintf(outputFile, toupperString(token1));
-          fprintf(outputFile, " ");
+          fprintf(outputFile, "%s ", toupperString(token1));
 
         } else {
+          printf("if not :   ");
           // So imprime a linha mesmo
-          fprintf(outputFile, toupperString(token1));
-          fprintf(outputFile, "\n");
+          fprintf(outputFile, "%s\n", toupperString(token1));
         }
 
         break;
 
       // Aqui so mexo se tiver if ou label
       case 2:
+        printf("case 2   ");
         if (strcmp(IF_STR, toupperString(token1)) == 0) {
+          printf("if if   ");
           // Achei um if!
           map<char*, int>::iterator equFound;
           equFound = equTable.find(token2);
@@ -133,20 +129,21 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
           }
 
         } else {
+          printf("if not if   ");
           // So imprime a linha mesmo
-          fprintf(outputFile, toupperString(token1));
-          fprintf(outputFile, " ");
-          fprintf(outputFile, toupperString(token2));
-          fprintf(outputFile, "\n");
+          fprintf(outputFile, "%s ", toupperString(token1));
+          fprintf(outputFile, "%s\n", toupperString(token2));
         }
 
         break;
 
       // Aqui so mexo se tiver equ ou label
       case 3:
+        printf("case 3   ");
         if (strcmp(EQU_STR, toupperString(token2)) == 0) {
+          printf("if equ   ");
           // Achei um equ!
-          char* equName;
+          char equName[] = "";
           map<char*, int>::iterator equFound;
           strcpy(equName, token1);
           equName[strlen(equName) - 1] = '\0';
@@ -164,28 +161,23 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
           }
 
         } else {
+          printf("if not equ   ");
           // So imprime a linha mesmo
-          fprintf(outputFile, toupperString(token1));
-          fprintf(outputFile, " ");
-          fprintf(outputFile, toupperString(token2));
-          fprintf(outputFile, " ");
-          fprintf(outputFile, toupperString(token3));
-          fprintf(outputFile, "\n");
+          fprintf(outputFile, "%s ", toupperString(token1));
+          fprintf(outputFile, "%s ", toupperString(token2));
+          fprintf(outputFile, "%s\n", toupperString(token3));
         }
 
         break;
 
       // Aqui so mexo se tiver label
       case 4:
+        printf("case 4   ");
         // So imprime a linha mesmo
-        fprintf(outputFile, toupperString(token1));
-        fprintf(outputFile, " ");
-        fprintf(outputFile, toupperString(token2));
-        fprintf(outputFile, " ");
-        fprintf(outputFile, toupperString(token3));
-        fprintf(outputFile, " ");
-        fprintf(outputFile, toupperString(token4));
-        fprintf(outputFile, "\n");
+        fprintf(outputFile, "%s ", toupperString(token1));
+        fprintf(outputFile, "%s ", toupperString(token2));
+        fprintf(outputFile, "%s ", toupperString(token3));
+        fprintf(outputFile, "%s\n", toupperString(token4));
 
         break;
 
@@ -193,6 +185,9 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
         printf("Nunca era nem para entrar aqui......... huh?\n");
         return;
     }
+    printf("\n");
+    printf("\n");
+    strcpy(line, "");
   }
 
   fclose(outputFile);
