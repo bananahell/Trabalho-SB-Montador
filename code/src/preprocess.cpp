@@ -116,12 +116,12 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
 
         if (token1LastChar == ':') {
           // Label sozinha agora vai ser alinhada
-          fprintf(outputFile, "%s ", toupperString(token1));
+          fprintf(outputFile, "%s ", toUpperString(token1));
           foundLabelAlone = true;
 
         } else {
           // Linha normal, entao so imprime a linha mesmo
-          fprintf(outputFile, "%s\n", toupperString(token1));
+          fprintf(outputFile, "%s\n", toUpperString(token1));
         }
 
         break;
@@ -130,10 +130,10 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
       case 2:
         foundLabelAlone = false;
 
-        if (strcmp(IF_STR, toupperString(token1)) == 0) {
+        if (strcmp(IF_STR, toUpperString(token1)) == 0) {
           // Achei um IF!
           map<string, int>::iterator equFound;
-          string equString(toupperString(token2));
+          string equString(toUpperString(token2));
           equFound = equTable.find(equString);
 
           // Procuro aqui a label usada pelo IF na equTable
@@ -146,28 +146,28 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
             isSuccess = false;
           }
 
-        } else if (strcmp(CONST_STR, toupperString(token1)) == 0) {
+        } else if (strcmp(CONST_STR, toUpperString(token1)) == 0) {
           // Achei um const!
           char tokenName[MAX_TOKEN_SIZE];
           map<string, int>::iterator tokenFound;
-          strcpy(tokenName, toupperString(token2));
+          strcpy(tokenName, toUpperString(token2));
 
           // Procuro aqui a label usada pelo CONST na equTable
-          string tokenString(toupperString(tokenName));
+          string tokenString(toUpperString(tokenName));
           tokenFound = equTable.find(tokenString);
           if (tokenFound == equTable.end()) {
             // Nao achei na equTable, entao pode ser o numero direto
-            fprintf(outputFile, "%s ", toupperString(token1));
-            fprintf(outputFile, "%s\n", toupperString(token2));
+            fprintf(outputFile, "%s ", toUpperString(token1));
+            fprintf(outputFile, "%s\n", toUpperString(token2));
           } else {
             // Achei na equTable, entao ja substitui
-            fprintf(outputFile, "%s ", toupperString(token1));
+            fprintf(outputFile, "%s ", toUpperString(token1));
             fprintf(outputFile, "%d\n", tokenFound->second);
           }
         } else {
           // Linha normal, entao so imprime a linha mesmo
-          fprintf(outputFile, "%s ", toupperString(token1));
-          fprintf(outputFile, "%s\n", toupperString(token2));
+          fprintf(outputFile, "%s ", toUpperString(token1));
+          fprintf(outputFile, "%s\n", toUpperString(token2));
         }
 
         break;
@@ -176,15 +176,15 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
       case 3:
         foundLabelAlone = false;
 
-        if (strcmp(EQU_STR, toupperString(token2)) == 0) {
+        if (strcmp(EQU_STR, toUpperString(token2)) == 0) {
           // Achei um EQU!
           char equName[MAX_TOKEN_SIZE];
           map<string, int>::iterator equFound;
-          strcpy(equName, toupperString(token1));
+          strcpy(equName, toUpperString(token1));
           equName[strlen(equName) - 1] = '\0';
 
           // Aqui procuro a label usada no EQU na equTable, esperando nao achar
-          string equString(toupperString(equName));
+          string equString(toUpperString(equName));
           equFound = equTable.find(equString);
           if (equFound == equTable.end()) {
             equTable.insert(pair<char*, int>(equName, atoi(token3)));
@@ -193,31 +193,31 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
             isSuccess = false;
           }
 
-        } else if (strcmp(CONST_STR, toupperString(token2)) == 0) {
+        } else if (strcmp(CONST_STR, toUpperString(token2)) == 0) {
           // Achei um CONST!
           char tokenName[MAX_TOKEN_SIZE];
           map<string, int>::iterator tokenFound;
-          strcpy(tokenName, toupperString(token3));
+          strcpy(tokenName, toUpperString(token3));
 
           // Procuro aqui a label usada pelo CONST na equTable
-          string tokenString(toupperString(tokenName));
+          string tokenString(toUpperString(tokenName));
           tokenFound = equTable.find(tokenString);
           if (tokenFound == equTable.end()) {
             // Nao achei na equTable, entao pode ser o numero direto
-            fprintf(outputFile, "%s ", toupperString(token1));
-            fprintf(outputFile, "%s ", toupperString(token2));
-            fprintf(outputFile, "%s\n", toupperString(token3));
+            fprintf(outputFile, "%s ", toUpperString(token1));
+            fprintf(outputFile, "%s ", toUpperString(token2));
+            fprintf(outputFile, "%s\n", toUpperString(token3));
           } else {
             // Achei na equTable, entao ja substitui
-            fprintf(outputFile, "%s ", toupperString(token1));
-            fprintf(outputFile, "%s ", toupperString(token2));
+            fprintf(outputFile, "%s ", toUpperString(token1));
+            fprintf(outputFile, "%s ", toUpperString(token2));
             fprintf(outputFile, "%d\n", tokenFound->second);
           }
         } else {
           // Linha normal, entao so imprime a linha mesmo
-          fprintf(outputFile, "%s ", toupperString(token1));
-          fprintf(outputFile, "%s ", toupperString(token2));
-          fprintf(outputFile, "%s\n", toupperString(token3));
+          fprintf(outputFile, "%s ", toUpperString(token1));
+          fprintf(outputFile, "%s ", toUpperString(token2));
+          fprintf(outputFile, "%s\n", toUpperString(token3));
         }
 
         break;
@@ -225,10 +225,10 @@ void preProcessCode(char* fileNameIn, char* fileNameOut) {
       // Aqui so imprime a linha mesmo
       case 4:
         // Linha normal, entao so imprime a linha mesmo
-        fprintf(outputFile, "%s ", toupperString(token1));
-        fprintf(outputFile, "%s ", toupperString(token2));
-        fprintf(outputFile, "%s ", toupperString(token3));
-        fprintf(outputFile, "%s\n", toupperString(token4));
+        fprintf(outputFile, "%s ", toUpperString(token1));
+        fprintf(outputFile, "%s ", toUpperString(token2));
+        fprintf(outputFile, "%s ", toUpperString(token3));
+        fprintf(outputFile, "%s\n", toUpperString(token4));
 
         foundLabelAlone = false;
         break;

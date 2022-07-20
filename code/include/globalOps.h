@@ -5,6 +5,21 @@
 #define WHITESPACE "\n\t "
 #define MAX_TOKEN_SIZE 100
 
+#define LEXIC_ERR_STR "Erro lexico"
+#define SYNTACTIC_ERR_STR "Erro sintatico"
+#define SEMANTIC_ERR_STR "Erro semantico"
+
+#define SECTION_TEXT_STR "SECTION TEXT"
+#define SECTION_DATA_STR "SECTION DATA"
+#define SECAO_TEXTO_STR "SECAO TEXTO"
+#define SECAO_DADOS_STR "SECAO DADOS"
+
+#define BEGIN_STR "BEGIN"
+#define END_STR "END"
+
+#define EXTERN_STR "EXTERN"
+#define PUBLIC_STR "PUBLIC"
+
 #define MACRO_STR "MACRO"
 #define ENDMACRO_STR "ENDMACRO"
 #define IF_STR "IF"
@@ -14,7 +29,7 @@
 
 #define ADD_STR "ADD"
 #define SUB_STR "SUB"
-#define MUL_STR "MUL"
+#define MUL_STR "MULT"
 #define DIV_STR "DIV"
 #define JMP_STR "JMP"
 #define JMPN_STR "JMPN"
@@ -42,7 +57,7 @@
 #define OUTPUT_OP 13
 #define STOP_OP 14
 
-int checkInstruction(char*);
-char* toupperString(char*);
+int checkInstruction(const char*);
+char* toUpperString(const char*);
 
 #endif  // GLOBALVARS
