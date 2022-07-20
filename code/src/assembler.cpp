@@ -323,6 +323,7 @@ void assembleCode(char* fileNameIn, char* fileNameOut) {
           }
         } else if (tokenVector.at(0) == COPY_STR) {
           outputFile << getOpcode(tokenVector.at(0)) << " ";
+          tokenVector.at(1).pop_back();
           tokenFound = symbolTable.find(tokenVector.at(1));
           if (checkLabel(tokenVector.at(1), lineCount) == true) {
             if (tokenFound == symbolTable.end()) {
@@ -333,6 +334,7 @@ void assembleCode(char* fileNameIn, char* fileNameOut) {
               outputFile << symbolTable.find(tokenVector.at(1))->second << " ";
             }
           } else {
+            outputFile << tokenVector.at(1) << " ";
             isSuccess = false;
           }
           tokenFound = symbolTable.find(tokenVector.at(2));
@@ -345,12 +347,14 @@ void assembleCode(char* fileNameIn, char* fileNameOut) {
               outputFile << symbolTable.find(tokenVector.at(2))->second << " ";
             }
           } else {
+            outputFile << tokenVector.at(2) << " ";
             isSuccess = false;
           }
         }
         break;
       case 4:
         outputFile << getOpcode(tokenVector.at(1)) << " ";
+        tokenVector.at(2).pop_back();
         tokenFound = symbolTable.find(tokenVector.at(2));
         if (checkLabel(tokenVector.at(2), lineCount) == true) {
           if (tokenFound == symbolTable.end()) {
@@ -361,6 +365,7 @@ void assembleCode(char* fileNameIn, char* fileNameOut) {
             outputFile << symbolTable.find(tokenVector.at(2))->second << " ";
           }
         } else {
+          outputFile << tokenVector.at(2) << " ";
           isSuccess = false;
         }
         tokenFound = symbolTable.find(tokenVector.at(3));
@@ -373,6 +378,7 @@ void assembleCode(char* fileNameIn, char* fileNameOut) {
             outputFile << symbolTable.find(tokenVector.at(3))->second << " ";
           }
         } else {
+          outputFile << tokenVector.at(3) << " ";
           isSuccess = false;
         }
         break;
